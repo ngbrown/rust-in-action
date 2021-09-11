@@ -1,5 +1,7 @@
 use clap::{App, Arg};
 use regex::Regex;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 fn main() {
     let args = App::new("grep-lite")
@@ -11,25 +13,33 @@ fn main() {
                 .takes_value(true)
                 .required(true),
         )
+        .arg(
+            Arg::with_name("input")
+                .help("File to search")
+                .takes_value(true)
+                .required(true),
+        )
         .get_matches();
 
     let ctx_lines = 2;
+
     let pattern = args.value_of("pattern").unwrap();
     let re = Regex::new(pattern).unwrap();
 
-    let haystack = "\
-Every face, every shop,
-bedroom window, public-house, and
-dark square is a picture
-feverishly turned--in search of what?
-It is the same with books.
-What do we seek
-through millions of pages?";
+    let input = args.value_of("input").unwrap();
+    let f = File::open(input).unwrap();
+    let reader = BufReader::new(f);
+
+    let mut reader_lines: Vec<String> = vec![];
+    for line_ in reader.lines() {
+        let line = line_.unwrap();
+        reader_lines.push(line);
+    }
 
     let mut tags: Vec<usize> = vec![];
     let mut ctx: Vec<Vec<(usize, String)>> = vec![];
 
-    for (i, line) in haystack.lines().enumerate() {
+    for (i, line) in reader_lines.iter().enumerate() {
         let contains_substring = re.find(line);
         match contains_substring {
             Some(_) => {
@@ -46,7 +56,7 @@ through millions of pages?";
         return;
     }
 
-    for (i, line) in haystack.lines().enumerate() {
+    for (i, line) in reader_lines.iter().enumerate() {
         for (j, tag) in tags.iter().enumerate() {
             let lower_bound = tag.saturating_sub(ctx_lines);
             let upper_bound = tag + ctx_lines;
