@@ -1,8 +1,21 @@
+use clap::{App, Arg};
 use regex::Regex;
 
 fn main() {
+    let args = App::new("grep-lite")
+        .version("0.1")
+        .about("searches for patterns")
+        .arg(
+            Arg::with_name("pattern")
+                .help("The pattern to search for")
+                .takes_value(true)
+                .required(true),
+        )
+        .get_matches();
+
     let ctx_lines = 2;
-    let re = Regex::new("picture").unwrap();
+    let pattern = args.value_of("pattern").unwrap();
+    let re = Regex::new(pattern).unwrap();
 
     let haystack = "\
 Every face, every shop,
