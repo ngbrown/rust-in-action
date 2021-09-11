@@ -1,6 +1,9 @@
+use regex::Regex;
+
 fn main() {
     let ctx_lines = 2;
-    let needle = "oo";
+    let re = Regex::new("picture").unwrap();
+
     let haystack = "\
 Every face, every shop,
 bedroom window, public-house, and
@@ -14,11 +17,15 @@ through millions of pages?";
     let mut ctx: Vec<Vec<(usize, String)>> = vec![];
 
     for (i, line) in haystack.lines().enumerate() {
-        if line.contains(needle) {
-            tags.push(i);
+        let contains_substring = re.find(line);
+        match contains_substring {
+            Some(_) => {
+                tags.push(i);
 
-            let v = Vec::with_capacity(2 * ctx_lines + 1);
-            ctx.push(v);
+                let v = Vec::with_capacity(2 * ctx_lines + 1);
+                ctx.push(v);
+            }
+            None => (),
         }
     }
 
