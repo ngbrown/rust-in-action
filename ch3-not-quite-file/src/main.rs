@@ -10,17 +10,37 @@ struct File {
     data: Vec<u8>,
 }
 
-impl File {
-    fn new(name: &str) -> File {
-        File {
-            name: String::from(name),
-            data: Vec::new(),
-        }
+// Overloading sorta... https://stackoverflow.com/a/67064869/25182
+enum NewFileParam {
+    Name(&'static str),
+    NameAndData(&'static str, &'static Vec<u8>),
+}
+impl From<&'static str> for NewFileParam {
+    fn from(n: &'static str) -> Self {
+        NewFileParam::Name(n)
     }
+}
+impl From<(&'static str, &'static Vec<u8>)> for NewFileParam {
+    fn from(p: (&'static str, &'static Vec<u8>)) -> Self {
+        NewFileParam::NameAndData(p.0, p.1)
+    }
+}
 
-    fn new_with_data(name: &str, data: &Vec<u8>) -> File {
-        let mut f = File::new(name);
-        f.data = data.clone();
+impl File {
+    fn new<T: Into<NewFileParam>>(t: T) -> File {
+        use NewFileParam::*;
+
+        let f = match t.into() {
+            Name(n) => File {
+                name: String::from(n),
+                data: Vec::new(),
+            },
+            NameAndData(n, d) => File {
+                name: String::from(n),
+                data: d.clone(),
+            },
+        };
+
         f
     }
 
@@ -52,7 +72,7 @@ fn close(f: File) -> Result<File, String> {
 
 fn main() {
     let f4_data: Vec<u8> = vec![114, 117, 115, 116, 33];
-    let mut f4 = File::new_with_data("f4.txt", &f4_data);
+    let mut f4 = File::new(("f4.txt", &f4_data));
 
     let mut buffer: Vec<u8> = vec![];
 
