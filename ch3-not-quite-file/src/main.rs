@@ -11,23 +11,23 @@ struct File {
 }
 
 // Overloading sorta... https://stackoverflow.com/a/67064869/25182
-enum NewFileParam {
-    Name(&'static str),
-    NameAndData(&'static str, &'static Vec<u8>),
+enum NewFileParam<'a> {
+    Name(&'a str),
+    NameAndData(&'a str, &'a Vec<u8>),
 }
-impl From<&'static str> for NewFileParam {
-    fn from(n: &'static str) -> Self {
+impl<'a> From<&'a str> for NewFileParam<'a> {
+    fn from(n: &'a str) -> Self {
         NewFileParam::Name(n)
     }
 }
-impl From<(&'static str, &'static Vec<u8>)> for NewFileParam {
-    fn from(p: (&'static str, &'static Vec<u8>)) -> Self {
+impl<'a> From<(&'a str, &'a Vec<u8>)> for NewFileParam<'a> {
+    fn from(p: (&'a str, &'a Vec<u8>)) -> Self {
         NewFileParam::NameAndData(p.0, p.1)
     }
 }
 
 impl File {
-    fn new<T: Into<NewFileParam>>(t: T) -> File {
+    fn new<'a, T: Into<NewFileParam<'a>>>(t: T) -> File {
         use NewFileParam::*;
 
         let f = match t.into() {
@@ -73,6 +73,7 @@ fn close(f: File) -> Result<File, String> {
 fn main() {
     let f4_data: Vec<u8> = vec![114, 117, 115, 116, 33];
     let mut f4 = File::new(("f4.txt", &f4_data));
+    //let mut f4 = File::new("f4.txt");
 
     let mut buffer: Vec<u8> = vec![];
 
