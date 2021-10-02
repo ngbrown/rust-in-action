@@ -17,6 +17,10 @@ struct File {
     state: FileState,
 }
 
+trait Read {
+    fn read(self: &Self, save_to: &mut Vec<u8>) -> Result<usize, String>;
+}
+
 impl File {
     fn new(name: &str) -> File {
         File {
@@ -31,7 +35,9 @@ impl File {
         f.data = data.clone();
         f
     }
+}
 
+impl Read for File {
     fn read(self: &File, save_to: &mut Vec<u8>) -> Result<usize, String> {
         if self.state != FileState::Open {
             return Err(String::from("File must be open for reading"));
