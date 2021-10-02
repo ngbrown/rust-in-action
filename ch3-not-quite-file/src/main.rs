@@ -1,3 +1,5 @@
+//! Simulating files one step at a time.
+
 use rand::prelude::*;
 use std::fmt::{Display, Formatter};
 
@@ -11,6 +13,8 @@ pub enum FileState {
     Closed,
 }
 
+/// Represents a "file",
+/// which probably lives on a file system.
 #[derive(Debug)]
 pub struct File {
     pub name: String,
@@ -32,6 +36,7 @@ impl Display for FileState {
 }
 
 impl File {
+    /// New files are assumed to be empty, but a name is required.
     pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
@@ -44,6 +49,16 @@ impl File {
         let mut f = File::new(name);
         f.data = data.clone();
         f
+    }
+
+    /// Returns the file's length in bytes.
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+
+    /// Returns the file's name.
+    pub fn name(&self) -> String {
+        self.name.clone()
     }
 }
 
@@ -104,6 +119,6 @@ fn main() {
 
     println!("{:?}", f6);
     println!("{}", f6);
-    println!("{} is {} bytes long", &f6.name, f6_length);
+    println!("{} is {} bytes long", &f6.name(), f6_length);
     println!("{}", text);
 }
