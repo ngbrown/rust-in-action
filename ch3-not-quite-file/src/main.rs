@@ -1,16 +1,16 @@
 use rand::prelude::*;
+use std::fmt::{Display, Formatter};
 
 fn one_in(denominator: u32) -> bool {
     thread_rng().gen_ratio(1, denominator)
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 enum FileState {
     Open,
     Closed,
 }
 
-#[derive(Debug)]
 struct File {
     name: String,
     data: Vec<u8>,
@@ -19,6 +19,15 @@ struct File {
 
 trait Read {
     fn read(self: &Self, save_to: &mut Vec<u8>) -> Result<usize, String>;
+}
+
+impl Display for FileState {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            FileState::Open => write!(f, "OPEN"),
+            FileState::Closed => write!(f, "CLOSED"),
+        }
+    }
 }
 
 impl File {
@@ -49,6 +58,12 @@ impl Read for File {
         save_to.reserve(read_length);
         save_to.append(&mut tmp);
         Ok(read_length)
+    }
+}
+
+impl Display for File {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "<{} ({})>", self.name, self.state)
     }
 }
 
@@ -86,7 +101,7 @@ fn main() {
 
     let text = String::from_utf8_lossy(&buffer);
 
-    println!("{:?}", f5);
+    println!("{}", f5);
     println!("{} is {} bytes long", &f5.name, f5_length);
     println!("{}", text);
 }
