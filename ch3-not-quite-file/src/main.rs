@@ -37,6 +37,12 @@ impl Display for FileState {
 
 impl File {
     /// New files are assumed to be empty, but a name is required.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let f = File::new("f1.txt");
+    /// ```
     pub fn new(name: &str) -> File {
         File {
             name: String::from(name),
