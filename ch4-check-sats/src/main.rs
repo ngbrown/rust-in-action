@@ -86,9 +86,14 @@ fn main() {
 
     println!("base: {:?}", base);
 
+    let mut base_3 = base.borrow_mut();
+    base_3.radio_freq -= 12.34;
+    println!("base_3: {:?}", base_3);
+
     let sat_ids = fetch_sat_ids();
 
     for sat_id in sat_ids {
+        // thread 'main' panicked at 'already mutably borrowed: BorrowError'
         let sat = base.borrow().connect(sat_id);
 
         let status = check_status(sat.clone());
