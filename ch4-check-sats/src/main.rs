@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct CubeSat {
     id: u64,
 }
@@ -51,13 +51,13 @@ impl Mailbox {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum StatusMessage {
     Ok,
 }
 
-fn check_status(sat_id: &CubeSat) {
-    println!("{:?}: {:?}", sat_id, StatusMessage::Ok);
+fn check_status(sat_id: CubeSat) -> StatusMessage {
+    StatusMessage::Ok
 }
 
 fn fetch_sat_ids() -> Vec<u64> {
@@ -73,6 +73,10 @@ fn main() {
 
     for sat_id in sat_ids {
         let sat = base.connect(sat_id);
+
+        let status = check_status(sat.clone());
+        println!("{:?}: {:?}", sat, status.clone());
+
         let msg = Message {
             to: sat_id,
             content: String::from("hello"),
@@ -84,6 +88,9 @@ fn main() {
 
     for sat_id in sat_ids {
         let sat = base.connect(sat_id);
+
+        let status = check_status(sat);
+        println!("{:?}: {:?}", sat, status);
 
         let msg = sat.recv(&mut mail);
         println!("{:?}: {:?}", sat, msg);
