@@ -16,11 +16,7 @@ type Message = String;
 struct GroundStation;
 
 impl GroundStation {
-    fn send(
-        &self,
-        to: &mut CubeSat,
-        msg: Message,
-    ) {
+    fn send(&self, to: &mut CubeSat, msg: Message) {
         to.mailbox.messages.push(msg);
     }
 }
@@ -43,9 +39,18 @@ fn check_status(sat_id: &CubeSat) {
 fn main() {
     let base = GroundStation {};
 
-    let mut sat_a = CubeSat { id: 0, mailbox: Mailbox { messages: vec![] } };
-    let sat_b = CubeSat { id: 1, mailbox: Mailbox { messages: vec![] } };
-    let sat_c = CubeSat { id: 2, mailbox: Mailbox { messages: vec![] } };
+    let mut sat_a = CubeSat {
+        id: 0,
+        mailbox: Mailbox { messages: vec![] },
+    };
+    let sat_b = CubeSat {
+        id: 1,
+        mailbox: Mailbox { messages: vec![] },
+    };
+    let sat_c = CubeSat {
+        id: 2,
+        mailbox: Mailbox { messages: vec![] },
+    };
 
     check_status(&sat_a);
 
