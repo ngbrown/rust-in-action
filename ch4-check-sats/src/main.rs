@@ -1,5 +1,7 @@
 #![allow(unused_variables)]
 
+use std::rc::Rc;
+
 #[derive(Debug, Clone, Copy)]
 struct CubeSat {
     id: u64,
@@ -16,6 +18,7 @@ struct Message {
     content: String,
 }
 
+#[derive(Debug)]
 struct GroundStation {}
 
 impl GroundStation {
@@ -67,7 +70,9 @@ fn fetch_sat_ids() -> Vec<u64> {
 fn main() {
     let mut mail = Mailbox { messages: vec![] };
 
-    let base = GroundStation {};
+    let base = Rc::new(GroundStation {});
+
+    println!("{:?}", base);
 
     let sat_ids = fetch_sat_ids();
 
