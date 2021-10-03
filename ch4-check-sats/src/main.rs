@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 
+use std::cell::RefCell;
 use std::rc::Rc;
 
 #[derive(Debug, Clone, Copy)]
@@ -19,7 +20,9 @@ struct Message {
 }
 
 #[derive(Debug)]
-struct GroundStation {}
+struct GroundStation {
+    radio_freq: f64, // Mhz
+}
 
 impl GroundStation {
     fn connect(&self, sat_id: u64) -> CubeSat {
@@ -70,14 +73,23 @@ fn fetch_sat_ids() -> Vec<u64> {
 fn main() {
     let mut mail = Mailbox { messages: vec![] };
 
-    let base = Rc::new(GroundStation {});
+    let base: Rc<RefCell<GroundStation>> =
+        Rc::new(RefCell::new(GroundStation { radio_freq: 87.65 }));
 
-    println!("{:?}", base);
+    println!("base: {:?}", base);
+
+    {
+        let mut base_2 = base.borrow_mut();
+        base_2.radio_freq -= 12.34;
+        println!("base_2: {:?}", base_2);
+    }
+
+    println!("base: {:?}", base);
 
     let sat_ids = fetch_sat_ids();
 
     for sat_id in sat_ids {
-        let sat = base.connect(sat_id);
+        let sat = base.borrow().connect(sat_id);
 
         let status = check_status(sat.clone());
         println!("{:?}: {:?}", sat, status.clone());
@@ -86,13 +98,13 @@ fn main() {
             to: sat_id,
             content: String::from("hello"),
         };
-        base.send(&mut mail, msg);
+        base.borrow().send(&mut mail, msg);
     }
 
     let sat_ids = fetch_sat_ids();
 
     for sat_id in sat_ids {
-        let sat = base.connect(sat_id);
+        let sat = base.borrow().connect(sat_id);
 
         let status = check_status(sat);
         println!("{:?}: {:?}", sat, status);
