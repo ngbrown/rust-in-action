@@ -1,17 +1,36 @@
+const BIAS: i32 = 127;
+const RADIX: f32 = 2.0;
+
 fn main() {
     let n: f32 = 42.42;
-    let n_bits: u32 = n.to_bits();
-    let sign_bit = n_bits >> 31;
+    let (sign, exp, frac) = to_parts(n);
+    let (sign_, exp_, mant) = decode(sign, exp, frac);
+    let n_ = from_parts(sign_, exp_, mant);
 
-    println!("sign_bit: {}", sign_bit);
+    println!("{} -> {}", n, n_);
+    println!("field     | as bits                 | as real number");
+    println!("sign      |                       {:01b} | {}", sign, sign_);
+    println!("exponent  |                {:08b} | {}", exp, exp_);
+    println!("mantissa  | {:023b} | {:.20}", frac, mant);
+}
 
-    let exponent_ = n_bits >> 23;
-    let exponent_ = exponent_ & 0xff;
-    let exponent = (exponent_ as i32) - 127;
+fn to_parts(n: f32) -> (u32, u32, u32) {
+    let bits: u32 = n.to_bits();
 
-    println!("exponent: {}", exponent);
+    let sign = (bits >> 31) & 0x01;
+    let exponent = (bits >> 23) & 0xff;
+    let fraction = bits & 0x7f_ffff;
 
-    let mut mantissa: f32 = match exponent_ {
+    (sign, exponent, fraction)
+}
+
+fn decode(sign: u32, exponent: u32, fraction: u32) -> (f32, f32, f32) {
+    let signed_1 = (-1_f32).powf(sign as f32);
+
+    let exponent_ = (exponent as i32) - BIAS;
+    let exponent_ = RADIX.powf(exponent_ as f32);
+
+    let mut mantissa: f32 = match exponent {
         0xff => 0.0,
         _ => 1.0,
     };
@@ -19,7 +38,7 @@ fn main() {
     // simpler would be to (optionally) 'or' (|) with the leading 1 and divide by 0x80_0000 (8_388_608)
     for i in 0..23 {
         let mask = 1 << i;
-        let one_at_bit_i = n_bits & mask;
+        let one_at_bit_i = fraction & mask;
         if one_at_bit_i != 0 {
             let i_ = i as f32;
             let weight = 2_f32.powf(i_ - 23.0);
@@ -27,5 +46,9 @@ fn main() {
         }
     }
 
-    println!("mantissa: {:.20}", mantissa);
+    (signed_1, exponent_, mantissa)
+}
+
+fn from_parts(sign: f32, exponent: f32, mantissa: f32) -> f32 {
+    sign * exponent * mantissa
 }
