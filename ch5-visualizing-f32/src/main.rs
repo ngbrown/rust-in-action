@@ -11,8 +11,12 @@ fn main() {
 
     println!("exponent: {}", exponent);
 
-    let mut mantissa: f32 = 1.0;
+    let mut mantissa: f32 = match exponent_ {
+        0xff => 0.0,
+        _ => 1.0,
+    };
 
+    // simpler would be to (optionally) 'or' (|) with the leading 1 and divide by 0x80_0000 (8_388_608)
     for i in 0..23 {
         let mask = 1 << i;
         let one_at_bit_i = n_bits & mask;
@@ -23,5 +27,5 @@ fn main() {
         }
     }
 
-    println!("mantissa: {}", mantissa);
+    println!("mantissa: {:.20}", mantissa);
 }
