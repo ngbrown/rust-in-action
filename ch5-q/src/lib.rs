@@ -73,11 +73,11 @@ mod tests {
     fn q7_to_f32() {
         let q1 = Q7::from(0.7_f32);
         let n1 = f32::from(q1);
-        assert_eq!(n1, 0.6953125);
+        assert!((n1 - 0.6953125_f32).abs() < f32::EPSILON);
 
         let q2 = Q7::from(n1);
         let n2 = f32::from(q2);
-        assert_eq!(n1, n2);
+        assert!((n1 - n2).abs() < f32::EPSILON);
     }
 
     #[test]
@@ -100,10 +100,10 @@ mod tests {
     fn q7_to_f64() {
         let q1 = Q7::from(0.7);
         let n1 = f64::from(q1);
-        assert_eq!(n1, 0.6953125);
+        assert!((n1 - 0.6953125_f64).abs() < f64::EPSILON);
 
         let q2 = Q7::from(n1);
         let n2 = f64::from(q2);
-        assert_eq!(n1, n2);
+        assert!((n1 - n2).abs() < f64::EPSILON);
     }
 }
