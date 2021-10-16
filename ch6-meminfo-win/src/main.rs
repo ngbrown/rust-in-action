@@ -1,11 +1,12 @@
 use winapi::{
-    DWORD, HANDLE, LPSYSTEM_INFO, LPVOID, MEMORY_BASIC_INFORMATION as MEM_INFO, PVOID, SIZE_T,
-    SYSTEM_INFO,
+    DUPLICATE_SAME_ACCESS, DWORD, FALSE, HANDLE, LPSYSTEM_INFO, LPVOID,
+    MEMORY_BASIC_INFORMATION as MEM_INFO, PVOID, SIZE_T, SYSTEM_INFO,
 };
 
 fn main() {
     let this_pid: DWORD;
     let this_proc_psudo: HANDLE;
+    let mut this_proc: HANDLE;
     let min_addr: LPVOID;
     let max_addr: LPVOID;
     let mut base_addr: PVOID;
@@ -15,6 +16,7 @@ fn main() {
     const MEM_INFO_SIZE: usize = std::mem::size_of::<MEM_INFO>();
 
     unsafe {
+        this_proc = std::mem::zeroed();
         base_addr = std::mem::zeroed();
         proc_info = std::mem::zeroed();
         mem_info = std::mem::zeroed();
@@ -26,13 +28,24 @@ fn main() {
         // returns a psudo handle of -1
         this_proc_psudo = kernel32::GetCurrentProcess();
 
+        // duplicate to get the real handle number
+        kernel32::DuplicateHandle(
+            this_proc_psudo,
+            this_proc_psudo,
+            this_proc_psudo,
+            &mut this_proc,
+            0,
+            FALSE,
+            DUPLICATE_SAME_ACCESS,
+        );
+
         kernel32::GetSystemInfo(&mut proc_info as LPSYSTEM_INFO);
     }
 
     min_addr = proc_info.lpMinimumApplicationAddress;
     max_addr = proc_info.lpMaximumApplicationAddress;
 
-    println!("{:?} @ {:p}", this_pid, this_proc_psudo);
+    println!("{:?} @ {:p}", this_pid, this_proc);
     println!("{:?}", proc_info);
     println!("min: {:p}, max: {:p}", min_addr, max_addr);
 
