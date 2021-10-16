@@ -18,6 +18,15 @@ fn main() -> std::io::Result<()> {
         for byte in &buffer {
             print!("{:02x} ", byte);
         }
+        print!("  ");
+        for byte in &buffer {
+            match *byte {
+                0x00 => print!("0"),
+                0x20..=0x7E => print!("{}", *byte as char),
+                0xff => print!("#"),
+                _ => print!("."),
+            }
+        }
 
         println!();
         pos += BYTES_PER_LINE;
