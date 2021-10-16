@@ -41,10 +41,10 @@ fn print_hex_dump_line(pos: u64, buffer: &[u8]) {
     print!("  ");
     for byte in buffer {
         match *byte {
-            0x00 => print!("0"),
+            0x0A => print!("↵"),
+            0x0D => print!("⇽"),
             0x20..=0x7E => print!("{}", *byte as char),
-            0xff => print!("#"),
-            _ => print!("."),
+            _ => print!("∙"),
         }
     }
 
