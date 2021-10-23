@@ -19,9 +19,9 @@ fn main() -> std::io::Result<()> {
         pos += BYTES_PER_LINE as u64;
     }
 
-    f.seek(SeekFrom::Start(pos)).unwrap();
+    f.seek(SeekFrom::Start(pos))?;
     let mut buffer_vec: Vec<u8> = vec![];
-    let bytes_to_end = f.read_to_end(&mut buffer_vec).unwrap();
+    let bytes_to_end = f.read_to_end(&mut buffer_vec)?;
     if bytes_to_end > 0 {
         print_hex_dump_line(pos, &buffer_vec);
         // pos += bytes_to_end;
