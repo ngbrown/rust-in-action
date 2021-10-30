@@ -102,7 +102,7 @@ impl ActionKV {
         Ok(Some(kv.value))
     }
 
-    fn get_at(&mut self, position: u64) -> io::Result<KeyValuePair> {
+    pub fn get_at(&mut self, position: u64) -> io::Result<KeyValuePair> {
         let mut f = BufReader::new(&mut self.f);
         f.seek(SeekFrom::Start(position))?;
         let kv = ActionKV::process_record(&mut f)?;
