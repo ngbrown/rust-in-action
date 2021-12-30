@@ -9,5 +9,9 @@ edition = "2021"
 chrono = "0.4.19"
 clap = "2"
 
+[target.'cfg(windows)'.dependencies]
+winapi = "0.2"
+kernel32-sys = "0.2"
+
 [target.'cfg(not(windows))'.dependencies]
 libc = "0.2"
