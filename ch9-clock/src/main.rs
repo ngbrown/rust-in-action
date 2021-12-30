@@ -73,7 +73,12 @@ impl Clock {
 fn main() {
     let app = App::new("clock")
         .version("0.1")
-        .about("Gets and (aspirationally) sets the time.")
+        .about("Gets and sets the time.")
+        .after_help(
+            "Note: UNIX timestamps are paresd as whole \
+            seconds since 1st January 1970 0:00:00 UTC. \
+            For more accuracy, use another format.",
+        )
         .arg(
             Arg::with_name("action")
                 .takes_value(true)
@@ -83,7 +88,7 @@ fn main() {
         .arg(
             Arg::with_name("std")
                 .short("s")
-                .long("standard")
+                .long("use-standard")
                 .takes_value(true)
                 .possible_values(&["rfc2822", "rfc3339", "timestamp"])
                 .default_value("rfc3339"),
