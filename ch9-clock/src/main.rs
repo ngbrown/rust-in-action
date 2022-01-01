@@ -1,3 +1,6 @@
+mod ntp;
+
+use crate::ntp::check_time;
 use chrono::{DateTime, Local, TimeZone};
 use clap::{App, Arg};
 use std::mem::zeroed;
@@ -82,7 +85,7 @@ fn main() {
         .arg(
             Arg::with_name("action")
                 .takes_value(true)
-                .possible_values(&["get", "set"])
+                .possible_values(&["get", "set", "check-ntp"])
                 .default_value("get"),
         )
         .arg(
@@ -125,6 +128,11 @@ fn main() {
             Some(_) => eprintln!("Unable to set the time: {:?}", maybe_error),
             None => (),
         }
+    } else if action == "check-ntp" {
+        let offset = check_time().unwrap() as isize;
+
+        println!("All servers combined (weighted) =>");
+        println!(" {}ms away from local system time", offset);
     }
 
     let now = Clock::get();
