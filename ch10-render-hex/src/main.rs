@@ -119,15 +119,6 @@ fn parse(input: &str) -> Vec<Operation> {
     let n_threads = 2;
     let (todo_tx, todo_rx) = unbounded();
     let (results_tx, results_rx) = unbounded();
-    let mut n_bytes = 0;
-    for (i, byte) in input.bytes().enumerate() {
-        todo_tx.send(Work::Task((i, byte))).unwrap();
-        n_bytes += 1;
-    }
-
-    for _ in 0..n_threads {
-        todo_tx.send(Work::Finished).unwrap();
-    }
 
     for _ in 0..n_threads {
         let todo = todo_rx.clone();
@@ -142,6 +133,17 @@ fn parse(input: &str) -> Vec<Operation> {
             results.send(result).unwrap();
         });
     }
+
+    let mut n_bytes = 0;
+    for (i, byte) in input.bytes().enumerate() {
+        todo_tx.send(Work::Task((i, byte))).unwrap();
+        n_bytes += 1;
+    }
+
+    for _ in 0..n_threads {
+        todo_tx.send(Work::Finished).unwrap();
+    }
+
     let mut ops = vec![Noop(0); n_bytes];
     for _ in 0..n_bytes {
         let (i, op) = results_rx.recv().unwrap();
