@@ -3,8 +3,9 @@
 #![feature(core_intrinsics)]
 #![feature(lang_items)]
 
-use core::intrinsics;
+use core::fmt;
 use core::panic::PanicInfo;
+use core::fmt::Write;
 
 use x86_64::instructions::hlt;
 
@@ -58,10 +59,30 @@ impl Cursor {
     }
 }
 
+impl fmt::Write for Cursor {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.print(s.as_bytes());
+        Ok(())
+    }
+}
+
 #[panic_handler]
 #[no_mangle]
-pub fn panic(_info: &PanicInfo) -> ! {
-    intrinsics::abort();
+pub fn panic(info: &PanicInfo) -> ! {
+    let mut cursor = Cursor {
+        position: 0,
+        foreground: Color::White,
+        background: Color::Red,
+    };
+    for _ in 0..(80 * 25) {
+        cursor.print(b" ");
+    }
+    cursor.position = 0;
+    write!(cursor, "{}", info).unwrap();
+
+    loop {
+        hlt();
+    }
 }
 
 #[lang = "eh_personality"]
